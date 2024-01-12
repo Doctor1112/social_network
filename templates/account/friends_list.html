@@ -1,0 +1,15 @@
+{% extends 'account/users_list.html' %}
+{% block title %}Друзья{% endblock title %}
+{% block content %}
+<div class="col">
+    <div class="e-tabs mb-3 px-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" href="{% url 'accounts:friends_list' visited_user.pk %}">Друзья</a></li>
+        {% if visited_user == user %}
+        <li class="nav-item"><a class="nav-link active" href="{% url 'accounts:friend_received_requests' %}">Входящие заявки</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{% url 'accounts:friend_sended_requests' %}">Исходящие заявки</a></li>
+        {% endif %}
+      </ul>
+    </div>
+{{ block.super }}
+{% endblock content %}

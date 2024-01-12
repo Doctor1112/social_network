@@ -1,0 +1,11 @@
+{% load user_tags %}
+{% get_data_for_fr_button cur_user user as btn_data %}
+    {% if btn_data.text == "Отклонить заявку" %}
+    <div>
+        <button class="btn btn-primary friend_button" id="accept_request" data-pk="{{ btn_data.pk }}">Принять заявку</button>
+    </div>
+
+{% endif %}
+<div class="ml-2">
+<button class="btn btn-primary friend_button" id="{{ btn_data.id }}" data-pk="{{ btn_data.pk }}">{{ btn_data.text }}</button>
+</div>

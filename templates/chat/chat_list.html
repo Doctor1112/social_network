@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load chat_tags %}
+{% block links %}
+<link href="{% static 'css/chat_list.css' %}" rel="stylesheet" type="text/css">
+{{ block.super }}
+{% endblock links %}
+{% block content %}
+<div class="container">
+<h3 class=" text-center">Мои сообщения</h3>
+<div class="messaging">
+        <div class="inbox_people">
+          <div class="inbox_chat">
+            {% for chat in page_obj %}
+            <a href="{{ chat.get_absolute_url }}">
+                {% if chat.unread_count > 0 %}
+                <div class="chat_list active_chat">
+                {% else %}
+                 <div class="chat_list">
+                    {% endif %}
+              <div class="chat_people">
+                <div class="chat_img"> <img src="{% get_chat_img chat user %}" alt=""> </div>
+                <div class="chat_ib">
+                  <h5>{% get_chat_name chat user %}  <span class="chat_date"><div>{{ chat.last_message.timestamp }}</div></span></h5>
+                  <h5>{{ chat.last_message.text }}
+                    {% if chat.unread_count > 0 %}
+                    <span class="badge bg-primary text-white">{{ chat.unread_count }}</span>
+                    {% endif %}
+                  </h5>
+                </div>
+              </div>
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+        </div>
+        {% include 'partials/pagination.html' %}
+      
+      
+    {% endblock %}

@@ -1,0 +1,56 @@
+<div class="card social-timeline-card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ post.author.get_absolute_url }}">
+                <div class="d-flex justify-content-between align-items-center">
+                <div class="mr-2">
+                    <img style="width: 40px;height:40px; border-radius: 50%;"
+                        src="{{ post.author.avatar.url }}" alt="">
+                </div>
+                <div class="ml-2">
+                    <div class="h5 m-0 text-blue">{{ post.author.fullname }}</div>
+                </div>
+            </div>
+            </a>
+            
+            {% if post.author == user %}
+            <div>
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop11"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop11">
+                        <a class="dropdown-item" href="{% url 'posts:edit' pk=post.pk %}">Изменить</a>
+                        <a class="dropdown-item" href="{% url 'posts:delete' pk=post.pk %}">Удалить</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+        <div class="card-body">
+        <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ post.created }}</div>
+            <h5 class="card-title">{{ post.text }}</h5>
+        {% if post.image %}
+        <div class="post-img">
+            <img style="width: 320px;height: 320px;" src="{{post.image.url}}" class="img-fluid">
+        </div>
+        
+        {% endif %}
+
+    </div>
+    
+    <div class="card-footer">
+        <span class="total">{{ post.likes.count }}</span>
+        <a href="#" data-id="{{ post.pk }}"
+            data-action="{% if request.user in post.likes.all %}un{% endif %}like" class="like card-link">
+            {% if request.user not in post.likes.all %}
+            like
+            {% else %}
+            unlike
+            {% endif %}
+        </a>
+        <a class="card-link" href="{% url 'posts:detail' pk=post.pk %}"><i class="fa fa-comment"></i></a> {{ post.comments.count }}
+    </div>
+</div>

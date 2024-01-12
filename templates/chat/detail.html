@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Чат{% endblock title %}
+{% block content %}
+<link href="{% static 'css/chat.css' %}" rel="stylesheet" type="text/css">
+<div class="container">
+<div class="messaging">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading row">
+                <img class="user_img" src="{{ chat_img }}">
+              <h4 class="ml-3 mt-1">{{ chat_name }}</h4>
+            </div>
+          </div>
+        <div class="mesgs">
+          <div class="msg_history">
+            
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+              <input type="text" class="write_msg" placeholder="Введите сообщение" />
+              <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+      
+            
+{{ chat.pk | json_script:"chat-pk" }}
+{{ user.pk | json_script:"user-pk" }}
+
+<script>
+
+    
+    const chat_pk = JSON.parse(document.getElementById('chat-pk').textContent);
+    const user_pk = JSON.parse(document.getElementById('user-pk').textContent);
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + chat_pk
+        + '/'
+    );
+    const chatLog = $('.msg_history');
+    var scroll_flag = true;
+    var prevScrollHeight = chatLog.prop("scrollHeight");
+
+    chatSocket.onopen = function(e) {
+        chatSocket.send(JSON.stringify({
+            "command": "fetch_prev_msgs"
+        }));
+    }
+    function sendedMsgHtml(message){
+
+        var msg = $(`<div class='outgoing_msg'>
+        <div class="sent_msg">
+                <p>${message.text}</p>
+                <span class="time_date">${message.datetime}</span> </div>
+                </div>`)
+        return msg
+    }
+
+    function receivedMsgHtml(message){
+        var msg = $(`<div class="incoming_msg">
+              <a href='${message.sender_url}'><div class="incoming_msg_img"> <img src="${message.sender_avatar_url}" alt="sunil"> </div></a>
+              <div class="received_msg">
+                <div class="received_withd_msg">
+                  <p>${message.text}</p>
+                  <span class="time_date">${message.datetime}</span></div>
+              </div>
+            </div>`);
+        return msg;
+    }
+
+    function messageHtml(message){
+        if (user_pk == message.sender_pk){
+            return sendedMsgHtml(message)
+        }
+        else {
+            return receivedMsgHtml(message)
+        }
+    }
+    function loadPrevMessages(messages){
+        console.log(chatLog);
+        for (let i=0; i < messages.length; i++){
+            msg = messageHtml(messages[i]);
+            chatLog.prepend(msg);
+        }
+        if (scroll_flag === true){
+            $(".msg_history").scrollTop($(".msg_history").prop("scrollHeight"));
+            scroll_flag = false;
+        }
+        else {
+            $(".msg_history").scrollTop($(".msg_history").prop("scrollHeight") - prevScrollHeight);
+        }
+        prevScrollHeight = $(".msg_history").prop("scrollHeight");
+    }
+    chatLog.on("scroll", function(){
+        console.log("scroll val: " + $(".msg_history").scrollTop())
+        if ($(".msg_history").scrollTop() == 0){
+            chatSocket.send(JSON.stringify({
+            "command": "fetch_prev_msgs"
+        }));
+        }
+    })
+
+    chatSocket.onmessage = function(e) {
+        console.log(e);
+        const data = JSON.parse(e.data);
+        if (data["command"] === "new_message"){
+            console.log(data);
+            msg_html = messageHtml(data);
+            chatLog.append(msg_html);
+            if (msg_html.attr("class") == "outgoing_msg"){
+                $(".msg_history").scrollTop($(".msg_history").prop("scrollHeight"));
+            }
+        } else if (data["command"] === "prev_messages"){
+            loadPrevMessages(data["messages"]);
+        }
+        
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('.write_msg').focus();
+    document.querySelector('.write_msg').onkeyup = function(e) {
+        if (e.key === 'Enter') {  // enter, return
+            document.querySelector('.msg_send_btn').click();
+        }
+    };
+
+    document.querySelector('.msg_send_btn').onclick = function(e) {
+        const messageInputDom = document.querySelector('.write_msg');
+        const message = messageInputDom.value;
+        if (message.length > 0){
+        chatSocket.send(JSON.stringify({
+            'message':  message,
+            "command": "new_message"
+        }));}
+        messageInputDom.value = '';
+        $(".msg_history").scrollTop($(".msg_history").prop("scrollHeight"))
+        
+    };
+</script>
+{% endblock content %}

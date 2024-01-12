@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Поиск друзей{% endblock title %}
+{% block links %}
+<link href="{% static 'css/users_list.css' %}" rel="stylesheet" type="text/css">
+{{ block.super }}
+{% endblock links %}
+{% block content %}
+{% csrf_token %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="people-nearby">
+            {% for object in page_obj %}
+            {% block user_item %}
+            <div class="nearby-user">
+              <div class="row">
+                <div class="col-md-2 col-sm-2">
+                  <img src="{{ object.avatar.url }}" alt="user" class="profile-photo-lg">
+                </div>
+                <div class="col-md-3 col-sm-5">
+                  <h5><a href="{{ object.get_absolute_url }}" class="profile-link">{{ object.fullname }}</a></h5>
+                </div>
+                {% if user != object %}
+                <div class="frnd_btns justify-content-between d-flex col-md-7 col-sm-7">
+                  {% include 'account/partials/friend_btn.html' with cur_user=user user=object %}
+                <div>
+                  <a class="btn btn-primary" href="{% url 'chat:open_chat' pk=object.pk %}">Отправить сообщение</a>
+                  {% endif %}
+                </div>
+                </div>
+
+                  
+
+                  
+              </div>
+            </div>
+            {% endblock user_item %}
+              {% endfor %}
+            </div>
+    	</div>
+	</div>
+</div>
+{% include 'partials/pagination.html' %}
+<script src="{% static 'js/friend_button.js' %}"></script>
+{% endblock content %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Feed{% endblock title %}
+{% block content %}
+{% csrf_token %}
+{% for post in page_obj %}
+{% include 'posts/partials/post.html' with post=post %}
+{% endfor %}
+<script src="{% static 'js/like_post.js' %}"></script>
+{% include 'partials/pagination.html' %}
+{% endblock content %}

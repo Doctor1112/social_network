@@ -1,0 +1,22 @@
+
+{% extends 'account/friends_list.html' %}
+{% block title %}Входящие запросы{% endblock title %}
+{% block user_item %}
+<div class="nearby-user">
+    <div class="row">
+      <div class="col-md-2 col-sm-2">
+        <img src="{{ object.receiver.avatar.url }}" alt="user" class="profile-photo-lg">
+      </div>
+      <div class="col-md-3 col-sm-5">
+        <h5><a href="{{ object.receiver.get_absolute_url }}" class="profile-link">{{ object.receiver.fullname }}</a></h5>
+      </div>
+      <div class="col-md-2 col-sm-2">
+        <button class="btn btn-primary friend_button" id="cancel_request" data-pk="{{ object.pk }}">Отменить заявку</button>
+    </div>
+
+      <div class="col-md-2 col-sm-2 ml-4">
+        <a class="btn btn-primary" href="{% url 'chat:open_chat' pk=object.receiver.pk %}">Отправить сообщение</a>
+      </div>
+    </div>
+  </div>
+{% endblock user_item %}

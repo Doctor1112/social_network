@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}{{ object.fullname }}{% endblock title %}
+{% block links %}
+<link href="{% static 'css/profile.css' %}" rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+{{ block.super }}
+{% endblock links %}
+{% block content %}
+{% csrf_token %}
+<main>
+    <div class="card social-prof">
+        <div class="card-body">
+            <div class="wrapper">
+                <img class='user-profile' src="{{ object.avatar.url }}">
+                <h3>{{ object.fullname }}</h3>
+            </div>
+            <div class="row ">
+                <div class="col-lg-12">
+                    <ul class=" nav nav-tabs justify-content-center s-nav">
+                        <li><a href="{% url 'accounts:friends_list' object.pk %}">Друзья</a> {{ friends_cnt }}</li>
+                        <div class="frnd_btns 5justify-content-between d-flex">
+                        {% if not is_current_user %}
+                    {% include 'account/partials/friend_btn.html' with cur_user=user user=object %}
+                    {% endif %}
+                        </div>
+                        {% if not is_current_user %}
+                        <li><a  href="{% url 'chat:open_chat' pk=object.pk %}">Отправить сообщение</a></li>
+                        {% else %}
+                        <li><a  href="{% url 'accounts:profile_edit' %}">Изменить профиль</a></li>
+                        {% endif %}
+                    </ul>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 gedf-main">
+            <!--- \\\\\\\Post-->
+            {% if is_current_user %}
+            <h4>Добавьте запись</h4>
+            <div class="card">
+                <div class="card-header">
+                    <form action="{% url 'posts:create' %}"method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button class="btn btn-success" type="submit">Создать</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            <!-- Post /////-->
+            <!--- \\\\\\\Post-->
+            {% for post in page_obj %}
+            {% include 'posts/partials/post.html' with post=post %}
+            {% endfor %}
+            <!-- Post /////-->
+        </div>
+
+    </div>
+    </div>
+    {% include 'partials/pagination.html' %}
+</main>
+<script src="{% static 'js/friend_button.js' %}"></script>
+<script src="{% static 'js/like_post.js' %}"></script>
+{% endblock content %}

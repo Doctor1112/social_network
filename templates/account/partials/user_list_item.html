@@ -1,0 +1,16 @@
+<div class="nearby-user">
+    <div class="row">
+      <div class="col-md-2 col-sm-2">
+        <img src="{{ user_object.avatar.url }}" alt="user" class="profile-photo-lg">
+      </div>
+      <div class="col-md-3 col-sm-5">
+        <h5><a href="{{ user_object.get_absolute_url }}" class="profile-link">{{ user_object.fullname }}</a></h5>
+      </div>
+      {% block friend_btn %}
+        {% include 'account/partials/friend_btn.html' with cur_user=user user=user_object %}
+        {% endblock friend_btn %  }
+      <div class="col-md-2 col-sm-2 ml-4">
+        <a class="btn btn-primary" href="{% url 'chat:open_chat' pk=user_object.pk %}">Отправить сообщение</a>
+      </div>
+    </div>
+  </div>

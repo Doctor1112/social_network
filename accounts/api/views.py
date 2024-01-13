@@ -69,5 +69,3 @@ class RemoveFromFriends(APIView):
         data["status"] = "removed"
         return Response(data)
     
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)

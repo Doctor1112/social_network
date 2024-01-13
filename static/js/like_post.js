@@ -1,15 +1,15 @@
 $(document).ready(function() {
 
     $(".like").click(function(e) {
-        const url = '/posts/like/';
         e.preventDefault();
         var likeButton = this;
         var likeCount = $(this).parent().find(".total");
+        const url = '/posts/like/' + likeButton.dataset.id + '/';
         console.log(likeCount);
         $.ajax({
             url: url,
             type: "POST",
-            data: { pk: likeButton.dataset.id , action: likeButton.dataset.action,
+            data: { action: likeButton.dataset.action,
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),},
             success: function(response) {
                     var previousAction = likeButton.dataset.action;

@@ -15,5 +15,5 @@ urlpatterns = [
     path("comments/create/<uuid:post_pk>/", CommentCreateView.as_view(), name="comment_create"),
     path("comments/edit/<int:pk>/", CommentUpdateView.as_view(), name="comment_edit"),
     path("comments/delete/<int:pk>/", CommentDeleteView.as_view(), name="comment_delete"),
-    path("like/", PostLikeView.as_view(), name="post_like")
+    path("like/<uuid:pk>/", PostLikeView.as_view(), name="post_like")
 ]

@@ -2,7 +2,7 @@ from typing import Any
 from django.http import HttpRequest
 from django.http.response import HttpResponse
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, CreateAPIView, UpdateAPIView, GenericAPIView
 from .serializers import CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -18,9 +18,7 @@ class CommentCreateView(CreateAPIView):
     lookup_url_kwarg = "post_pk"
 
     def perform_create(self, serializer):
-        serializer.validated_data['author'] = self.request.user
-        serializer.validated_data['post'] = self.get_object()
-        serializer.save()
+        serializer.save(author=self.request.user, post=self.get_object())
 
     
 class CommentUpdateView(OwnerRequiredMixin, UpdateAPIView):
@@ -28,17 +26,15 @@ class CommentUpdateView(OwnerRequiredMixin, UpdateAPIView):
     queryset = Comment.objects.all()
     permission_classes = [IsAuthenticated]
 
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return super().dispatch(request, *args, **kwargs)
 
 
-class PostLikeView(APIView):
+class PostLikeView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = Post.objects.all()
 
-    def post(self, request):
-        pk = request.POST.get("pk")
+    def post(self, request, pk):
         action = request.POST.get("action")
-        post = get_object_or_404(Post, pk=pk)
+        post = self.get_object()
         if action == "like":
             post.likes.add(request.user)
         else:

@@ -4,6 +4,7 @@ $(document).ready(function() {
         "accepted": accepted,
         "rejected": rejected,
         "removed": removed,
+        "request not found": request_not_found
     };
     const buttonIdFunctions = {
         "add_friend": add_friend,
@@ -16,7 +17,6 @@ $(document).ready(function() {
     $(".friend_button").click(function(e) {
         var button = $(this);
         var id = button.attr("id")
-        var data = {};
         data = buttonIdFunctions[id](button);
         var csrf = $('input[name=csrfmiddlewaretoken]').val()
         data.data.csrfmiddlewaretoken = csrf
@@ -33,36 +33,35 @@ $(document).ready(function() {
 
             error: function(error){
                 console.error("Error", error);
-                location.reload();
                 }
             })
 
     })
     function add_friend(button){
         var pk = button.attr("data-pk");
-        var url = '/accounts/send_friend_request/';
+        var url = '/accounts/send_friend_request/' + pk + '/';
 
-        return {url: url, data: {user_pk: pk}, method: "POST"};
+        return {url: url, data: {}, method: "POST"};
     }
     function reject_request(button){
         var pk = button.attr("data-pk");
-        var url = '/accounts/reject_friend_request/' + pk;
+        var url = '/accounts/reject_friend_request/' + pk + '/';
         return {url: url, data: {}, method: "DELETE"};
     }
     function cancel_request(button){
         var pk = button.attr("data-pk");
-        var url = '/accounts/reject_friend_request/' + pk;
+        var url = '/accounts/reject_friend_request/' + pk + '/';
         return {url: url, data: {}, method: "DELETE"};
     }
     function remove_friend(button){
         var pk = button.attr("data-pk");
-        var url = '/accounts/remove_from_friends/' + pk;
+        var url = '/accounts/remove_from_friends/' + pk + '/';
         return {url: url, data: {}, method: "DELETE"};
     }
     function accept_request(button){
         var pk = button.attr("data-pk");
-        var url = '/accounts/accept_friend_request/';
-        return {url: url, data: {pk: pk}, method: "POST"};
+        var url = '/accounts/accept_friend_request/' + pk + '/';
+        return {url: url, data: {}, method: "POST"};
     }
 
     function sended(button){
@@ -85,5 +84,9 @@ $(document).ready(function() {
     function removed(button){
         button.attr("id", "add_friend");
         return {html: "Добавить в друзья"};
+    }
+
+    function request_not_found(button){
+        location.reload();
     }
 })

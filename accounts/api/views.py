@@ -13,8 +13,7 @@ User = get_user_model()
 class SendFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        receiver_pk = request.POST["user_pk"]
+    def post(self, request, receiver_pk):
         receiver = get_object_or_404(User, pk=receiver_pk)
         req = FriendRequest.objects.filter(sender=receiver, receiver=request.user).first()
         if req:
@@ -33,9 +32,10 @@ class SendFriendRequestView(APIView):
 class AcceptFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        request_pk = request.POST["pk"]
-        fr_request = get_object_or_404(FriendRequest, pk=request_pk)
+    def post(self, request, pk):
+        fr_request = FriendRequest.objects.filter(pk=pk).first()
+        if not fr_request:
+            return Response({"status": "request not found"})
         sender = fr_request.sender
         accept_friend_request(fr_request)
         data = UserSerializer(sender).data
@@ -47,7 +47,9 @@ class RejectFriendRequest(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, pk):
-        fr_request = get_object_or_404(FriendRequest, pk=pk)
+        fr_request = FriendRequest.objects.filter(pk=pk).first()
+        if not fr_request:
+            return Response({"status": "request not found"})
         if request.user == fr_request.sender:
             resp_user = fr_request.receiver
         else:
